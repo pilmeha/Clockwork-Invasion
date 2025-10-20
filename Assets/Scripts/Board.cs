@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public sealed class Board : MonoBehaviour
 {
@@ -41,6 +43,14 @@ public sealed class Board : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (!Input.GetKeyDown(KeyCode.A)) return;
+
+        foreach (var connectedTile in Tiles[0, 0].GetConnectedTiles()) connectedTile.icon.transform.DOScale(1.25f, TweenDuration).Play();
+        
+    }
+    
     public async void Select(Tile tile)
     {
         if (!_selection.Contains(tile)) _selection.Add(tile);
@@ -81,5 +91,15 @@ public sealed class Board : MonoBehaviour
         
         tile1.Item = tile2.Item;
         tile2.Item = tile1Item;
+    }
+
+    private bool CanPop()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void Pop()
+    {
+        throw new NotImplementedException();
     }
 }
