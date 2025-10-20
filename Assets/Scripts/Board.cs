@@ -61,8 +61,14 @@ public sealed class Board : MonoBehaviour
         
         await Swap(_selection[0], _selection[1]);
 
-        if (CanPop()) Pop();
-        else await Swap(_selection[0], _selection[1]);
+        if (CanPop())
+        {
+            Pop();
+        }
+        else
+        {
+            await Swap(_selection[0], _selection[1]);
+        }
         
         
         _selection.Clear();
@@ -117,7 +123,7 @@ public sealed class Board : MonoBehaviour
                 
                 var connectedTiles = tile.GetConnectedTiles();
 
-                if (connectedTiles.Count < 2) continue;
+                if (connectedTiles.Skip(1).Count() < 2) continue;
                 
                 var deflateSequence = DOTween.Sequence();
 
