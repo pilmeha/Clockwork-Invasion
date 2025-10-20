@@ -146,6 +146,9 @@ public sealed class Board : MonoBehaviour
                 
                 await inflateSequence.Play()
                     .AsyncWaitForCompletion();
+
+                x = 0;
+                y = 0;
             }
         }
     }
