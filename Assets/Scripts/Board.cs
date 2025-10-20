@@ -58,7 +58,18 @@ public sealed class Board : MonoBehaviour
     
     public async void Select(Tile tile)
     {
-        if (!_selection.Contains(tile)) _selection.Add(tile);
+        if (!_selection.Contains(tile))
+        {
+            if (_selection.Count > 0)
+            {
+                if (Array.IndexOf(_selection[0].Neighbours, tile) != -1) _selection.Add(tile);
+            }
+            else
+            {
+                _selection.Add(tile);
+            }
+        }
+        
         
         if (_selection.Count < 2) return;
         
