@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using Random = UnityEngine.Random;
 
 public sealed class Board : MonoBehaviour
@@ -131,6 +132,8 @@ public sealed class Board : MonoBehaviour
 
                 await deflateSequence.Play()
                     .AsyncWaitForCompletion();
+
+                ScoreCounter.Instance.Score += tile.Item.value * connectedTiles.Count;
 
                 var inflateSequence = DOTween.Sequence();
                 
