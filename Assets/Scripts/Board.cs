@@ -40,14 +40,21 @@ public sealed class Board : MonoBehaviour
 
                 tile.x = x;
                 tile.y = y;
+
+                RandomFillBoard(tile);
                 
-                tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+                //tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
 
                 Tiles[x, y] = tile;
             }
         }
     }
 
+    private void RandomFillBoard(Tile tile)
+    {
+        tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+    }
+    
     private void Update()
     {
         if (!Input.GetKeyDown(KeyCode.A)) return;
@@ -55,6 +62,8 @@ public sealed class Board : MonoBehaviour
         foreach (var connectedTile in Tiles[0, 0].GetConnectedTiles()) connectedTile.icon.transform.DOScale(1.25f, TweenDuration).Play();
         
     }
+
+
     
     public async void Select(Tile tile)
     {
@@ -113,12 +122,70 @@ public sealed class Board : MonoBehaviour
         tile1.icon = icon2;
         tile2.icon = icon1;
 
-        var tile1Item = tile1.Item;
-        
-        tile1.Item = tile2.Item;
-        tile2.Item = tile1Item;
+        SwapItems(tile1, tile2);
     }
 
+    private bool HasPossibleMoves()
+    {
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var tile = Tiles[x, y];
+                
+                // Проверяем соседей (вправо и вниз)
+                // чтобы не дублировать проверки
+                var right = tile.Right;
+                var bottom = tile.Bottom;
+
+                if (right != null)
+                {
+                    SwapItems(tile, right);
+                    if (CanPop())
+                    {
+                        SwapItems(tile, right); // откат
+                        return true;
+                    }
+                    SwapItems(tile, right);
+                }
+
+                if (bottom != null)
+                {
+                    SwapItems(tile, bottom);
+                    if (CanPop())
+                    {
+                        SwapItems(tile, bottom); // откат
+                        return true;
+                    }
+                    SwapItems(tile, bottom);
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    private void SwapItems(Tile tile1, Tile tile2)
+    {
+        var temp = tile1.Item;
+        tile1.Item = tile2.Item;
+        tile2.Item = temp;
+    }
+
+    private void RegenerateBoard()
+    {
+        Debug.Log("No more moves! Regenerating board...");
+
+        do
+        {
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                RandomFillBoard(Tiles[x, y]);
+            //Tiles[x, y].Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+        }
+        while (!CanPop() && !HasPossibleMoves());
+    }
+    
     private bool CanPop()
     {
         for (var y = 0; y < Height; y++)
@@ -167,6 +234,12 @@ public sealed class Board : MonoBehaviour
                 x = 0;
                 y = 0;
             }
+        }
+        
+        // Проверяем после каждого "взрыва" доски
+        if (!HasPossibleMoves())
+        {
+            RegenerateBoard();
         }
     }
 }
