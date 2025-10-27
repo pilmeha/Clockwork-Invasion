@@ -170,10 +170,28 @@ public sealed class Board : MonoBehaviour
         tile2.Item = temp;
     }
 
-    private void RegenerateBoard()
+    private async void RegenerateBoard()
     {
         Debug.Log("No more moves! Regenerating board...");
         
+        // Анимация исчезновения
+        
+        const float fastTweenDuration = 0.15f; // Быстрее чем обычная анимация
+
+        var hideSequence = DOTween.Sequence();
+
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var tile = Tiles[x, y];
+                hideSequence.Join(tile.icon.transform.DOScale(Vector3.zero, fastTweenDuration));
+            }
+        }
+        
+        await hideSequence.Play().AsyncWaitForCompletion();
+        
+        // Перегенерация с новыми элементами
         do
         {
             for (int y = 0; y < Height; y++)
@@ -181,6 +199,23 @@ public sealed class Board : MonoBehaviour
                     RandomFillBoard(Tiles[x, y]);
         }
         while (!CanPop() && !HasPossibleMoves());
+        
+        // Анимация появление
+        var showSequence = DOTween.Sequence();
+
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var tile =  Tiles[x, y];
+                float delay = (x + y) * 0.02f; // 0.02f между каждой плиткой
+                showSequence.Join(tile.icon.transform.DOScale(Vector3.one, fastTweenDuration).SetDelay(delay));
+            }
+        }
+        
+        await showSequence.Play().AsyncWaitForCompletion();
+        
+        Debug.Log("Board regenerated!");
     }
     
     private bool CanPop()
