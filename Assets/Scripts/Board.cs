@@ -165,33 +165,36 @@ public sealed class Board : MonoBehaviour
 
     private void SwapItems(Tile tile1, Tile tile2)
     {
-        var temp = tile1.Item;
-        tile1.Item = tile2.Item;
-        tile2.Item = temp;
+        (tile1.Item, tile2.Item) = (tile2.Item, tile1.Item);
     }
 
     private async void RegenerateBoard()
     {
         Debug.Log("No more moves! Regenerating board...");
+    
+        const float flashDuration = 0.15f;
+    
+        // Анимация случайного исчезновения
+        var hideSequence =  DOTween.Sequence();
+        var tilesList = Tiles.Cast<Tile>().ToList();
         
-        // Анимация исчезновения
-        
-        const float fastTweenDuration = 0.15f; // Быстрее чем обычная анимация
-
-        var hideSequence = DOTween.Sequence();
-
-        for (int y = 0; y < Height; y++)
+        // Перемешиваем порядок плиток
+        for (int i = 0; i < tilesList.Count; i++)
         {
-            for (int x = 0; x < Width; x++)
-            {
-                var tile = Tiles[x, y];
-                hideSequence.Join(tile.icon.transform.DOScale(Vector3.zero, fastTweenDuration));
-            }
+            int randomIndex = Random.Range(i, tilesList.Count);
+            (tilesList[i], tilesList[randomIndex]) = (tilesList[randomIndex], tilesList[i]);
         }
-        
+
+        foreach (var tile in tilesList)
+        {
+            hideSequence.Join(tile.icon.transform.DOScale(Vector3.zero, flashDuration)
+                    .SetDelay(Random.Range(0f, 0.3f)) // Случайная задержка);
+            );
+        }
+
         await hideSequence.Play().AsyncWaitForCompletion();
         
-        // Перегенерация с новыми элементами
+        // Перегенерация
         do
         {
             for (int y = 0; y < Height; y++)
@@ -199,23 +202,19 @@ public sealed class Board : MonoBehaviour
                     RandomFillBoard(Tiles[x, y]);
         }
         while (!CanPop() && !HasPossibleMoves());
-        
-        // Анимация появление
+    
+        // Анимация случайного появления
         var showSequence = DOTween.Sequence();
-
-        for (int y = 0; y < Height; y++)
+    
+        foreach (var tile in tilesList)
         {
-            for (int x = 0; x < Width; x++)
-            {
-                var tile =  Tiles[x, y];
-                float delay = (x + y) * 0.02f; // 0.02f между каждой плиткой
-                showSequence.Join(tile.icon.transform.DOScale(Vector3.one, fastTweenDuration).SetDelay(delay));
-            }
+            showSequence.Join(tile.icon.transform.DOScale(Vector3.one, flashDuration)
+                    .SetEase(Ease.OutBack)
+                    .SetDelay(Random.Range(0f, 0.4f)) // Случайная задержка
+            );
         }
-        
+    
         await showSequence.Play().AsyncWaitForCompletion();
-        
-        Debug.Log("Board regenerated!");
     }
     
     private bool CanPop()
