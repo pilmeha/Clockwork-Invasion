@@ -43,8 +43,6 @@ public sealed class Board : MonoBehaviour
 
                 RandomFillBoard(tile);
                 
-                //tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
-
                 Tiles[x, y] = tile;
             }
         }
@@ -179,9 +177,8 @@ public sealed class Board : MonoBehaviour
         do
         {
             for (int y = 0; y < Height; y++)
-            for (int x = 0; x < Width; x++)
-                RandomFillBoard(Tiles[x, y]);
-            //Tiles[x, y].Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+                for (int x = 0; x < Width; x++)
+                    RandomFillBoard(Tiles[x, y]);
         }
         while (!CanPop() && !HasPossibleMoves());
     }
