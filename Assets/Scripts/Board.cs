@@ -173,7 +173,7 @@ public sealed class Board : MonoBehaviour
     private void RegenerateBoard()
     {
         Debug.Log("No more moves! Regenerating board...");
-
+        
         do
         {
             for (int y = 0; y < Height; y++)
