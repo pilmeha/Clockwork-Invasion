@@ -172,7 +172,7 @@ public sealed class Board : MonoBehaviour
     {
         Debug.Log("No more moves! Regenerating board...");
     
-        const float flashDuration = 0.15f;
+        const float flashDuration = 0.09f;
     
         // Анимация случайного исчезновения
         var hideSequence =  DOTween.Sequence();
@@ -188,7 +188,7 @@ public sealed class Board : MonoBehaviour
         foreach (var tile in tilesList)
         {
             hideSequence.Join(tile.icon.transform.DOScale(Vector3.zero, flashDuration)
-                    .SetDelay(Random.Range(0f, 0.3f)) // Случайная задержка);
+                    .SetDelay(Random.Range(0f, 0.1f)) // Случайная задержка);
             );
         }
 
@@ -210,7 +210,7 @@ public sealed class Board : MonoBehaviour
         {
             showSequence.Join(tile.icon.transform.DOScale(Vector3.one, flashDuration)
                     .SetEase(Ease.OutBack)
-                    .SetDelay(Random.Range(0f, 0.4f)) // Случайная задержка
+                    .SetDelay(Random.Range(0f, 0.15f)) // Случайная задержка
             );
         }
     
