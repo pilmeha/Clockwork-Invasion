@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Parrot
   m_EditorClassIdentifier: 
   value: 15
+  isEnergy: 1
   sprite: {fileID: 21300000, guid: 6646d2fecd4737e439b931bc301b0337, type: 3}
