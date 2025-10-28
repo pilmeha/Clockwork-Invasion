@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ public sealed class ScoreCounter : MonoBehaviour
         ScoreGear += value;
         UpdateUI();
     }
-
+    
     private void UpdateUI()
     {
         scoreTextEnergy.SetText($"{ScoreEnergy}");

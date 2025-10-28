@@ -252,6 +252,7 @@ public sealed class Board : MonoBehaviour
                     ScoreCounter.Instance.AddToGear(gainedScore);
                 
                 
+                
                 await deflateSequence.Play()
                     .AsyncWaitForCompletion();
                 
