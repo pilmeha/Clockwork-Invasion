@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7aec9666c70af654f843c97262ff0309, type: 3}
-  m_Name: Giraffe
+  m_Name: anime_gear
   m_EditorClassIdentifier: 
   value: 5
-  sprite: {fileID: 21300000, guid: b0d49f6c9d9f7944b9bcf83ca574673c, type: 3}
+  isEnergy: 0
+  sprite: {fileID: 21300000, guid: b2dc4c8089b8a494e8cc23adf1a94c4e, type: 3}
