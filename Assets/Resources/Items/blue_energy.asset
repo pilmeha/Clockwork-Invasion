@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aec9666c70af654f843c97262ff0309, type: 3}
   m_Name: blue_energy
   m_EditorClassIdentifier: 
-  value: 0
-  isEnergy: 0
-  sprite: {fileID: 0}
+  value: 15
+  isEnergy: 1
+  sprite: {fileID: 21300000, guid: 85a6d8a07f124fc4e9cf80f0cc3b2100, type: 3}

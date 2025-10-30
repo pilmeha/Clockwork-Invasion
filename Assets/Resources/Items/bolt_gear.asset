@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aec9666c70af654f843c97262ff0309, type: 3}
   m_Name: bolt_gear
   m_EditorClassIdentifier: 
-  value: 0
+  value: 10
   isEnergy: 0
-  sprite: {fileID: 0}
+  sprite: {fileID: 21300000, guid: 671b576cf2da42047b46ad3e0d3772ac, type: 3}

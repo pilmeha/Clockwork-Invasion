@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aec9666c70af654f843c97262ff0309, type: 3}
   m_Name: horror_gear
   m_EditorClassIdentifier: 
-  value: 0
+  value: 7
   isEnergy: 0
-  sprite: {fileID: 0}
+  sprite: {fileID: 21300000, guid: cce2ff856ca1b2b4cb0182585ffeee6f, type: 3}
