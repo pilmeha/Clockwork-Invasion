@@ -40,14 +40,19 @@ public sealed class Board : MonoBehaviour
 
                 tile.x = x;
                 tile.y = y;
-                
-                tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
 
+                RandomFillBoard(tile);
+                
                 Tiles[x, y] = tile;
             }
         }
     }
 
+    private void RandomFillBoard(Tile tile)
+    {
+        tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+    }
+    
     private void Update()
     {
         if (!Input.GetKeyDown(KeyCode.A)) return;
@@ -55,6 +60,8 @@ public sealed class Board : MonoBehaviour
         foreach (var connectedTile in Tiles[0, 0].GetConnectedTiles()) connectedTile.icon.transform.DOScale(1.25f, TweenDuration).Play();
         
     }
+
+
     
     public async void Select(Tile tile)
     {
@@ -113,12 +120,103 @@ public sealed class Board : MonoBehaviour
         tile1.icon = icon2;
         tile2.icon = icon1;
 
-        var tile1Item = tile1.Item;
-        
-        tile1.Item = tile2.Item;
-        tile2.Item = tile1Item;
+        SwapItems(tile1, tile2);
     }
 
+    private bool HasPossibleMoves()
+    {
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var tile = Tiles[x, y];
+                
+                // Проверяем соседей (вправо и вниз)
+                // чтобы не дублировать проверки
+                var right = tile.Right;
+                var bottom = tile.Bottom;
+
+                if (right != null)
+                {
+                    SwapItems(tile, right);
+                    if (CanPop())
+                    {
+                        SwapItems(tile, right); // откат
+                        return true;
+                    }
+                    SwapItems(tile, right);
+                }
+
+                if (bottom != null)
+                {
+                    SwapItems(tile, bottom);
+                    if (CanPop())
+                    {
+                        SwapItems(tile, bottom); // откат
+                        return true;
+                    }
+                    SwapItems(tile, bottom);
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    private void SwapItems(Tile tile1, Tile tile2)
+    {
+        (tile1.Item, tile2.Item) = (tile2.Item, tile1.Item);
+    }
+
+    private async void RegenerateBoard()
+    {
+        Debug.Log("No more moves! Regenerating board...");
+    
+        const float flashDuration = 0.09f;
+    
+        // Анимация случайного исчезновения
+        var hideSequence =  DOTween.Sequence();
+        var tilesList = Tiles.Cast<Tile>().ToList();
+        
+        // Перемешиваем порядок плиток
+        for (int i = 0; i < tilesList.Count; i++)
+        {
+            int randomIndex = Random.Range(i, tilesList.Count);
+            (tilesList[i], tilesList[randomIndex]) = (tilesList[randomIndex], tilesList[i]);
+        }
+
+        foreach (var tile in tilesList)
+        {
+            hideSequence.Join(tile.icon.transform.DOScale(Vector3.zero, flashDuration)
+                    .SetDelay(Random.Range(0f, 0.1f)) // Случайная задержка);
+            );
+        }
+
+        await hideSequence.Play().AsyncWaitForCompletion();
+        
+        // Перегенерация
+        do
+        {
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                    RandomFillBoard(Tiles[x, y]);
+        }
+        while (!CanPop() && !HasPossibleMoves());
+    
+        // Анимация случайного появления
+        var showSequence = DOTween.Sequence();
+    
+        foreach (var tile in tilesList)
+        {
+            showSequence.Join(tile.icon.transform.DOScale(Vector3.one, flashDuration)
+                    .SetEase(Ease.OutBack)
+                    .SetDelay(Random.Range(0f, 0.15f)) // Случайная задержка
+            );
+        }
+    
+        await showSequence.Play().AsyncWaitForCompletion();
+    }
+    
     private bool CanPop()
     {
         for (var y = 0; y < Height; y++)
@@ -147,7 +245,13 @@ public sealed class Board : MonoBehaviour
 
                 audioSource.PlayOneShot(collectSound);
                 
-                ScoreCounter.Instance.Score += tile.Item.value * connectedTiles.Count;
+                int gainedScore = tile.Item.value * connectedTiles.Count;
+                if (tile.Item.isEnergy)
+                    ScoreCounter.Instance.AddToEnergy(gainedScore);
+                else
+                    ScoreCounter.Instance.AddToGear(gainedScore);
+                
+                
                 
                 await deflateSequence.Play()
                     .AsyncWaitForCompletion();
@@ -167,6 +271,12 @@ public sealed class Board : MonoBehaviour
                 x = 0;
                 y = 0;
             }
+        }
+        
+        // Проверяем после каждого "взрыва" доски
+        if (!HasPossibleMoves())
+        {
+            RegenerateBoard();
         }
     }
 }
